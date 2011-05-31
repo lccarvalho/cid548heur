@@ -97,7 +97,7 @@ int main(int argc, char* argv[]){
     readIn(obj, satH, satV, argv[1]);
     
     n = satH.size();
-    cout << "SATELITES HORIZONTAIS" << endl;
+    cout << "SATELITES HORIZONTAIS: " << endl;
     for(i=0;i<n;i++){
         cout << "satelite H " << i+1 << ": Memoria Total: " << satH[i].memTotal << endl;
     }
@@ -105,7 +105,7 @@ int main(int argc, char* argv[]){
     cout << endl;
 
     n = satV.size();
-    cout << "SATELITES VERTICAIS" << endl;
+    cout << "SATELITES VERTICAIS: " << endl;
     for(i=0;i<n;i++){
         cout << "satelite V " << i+1 << ": Memoria Total: " << satV[i].memTotal << endl;
     }
@@ -113,7 +113,7 @@ int main(int argc, char* argv[]){
     cout << endl;
 
     n = obj.size();
-    cout << "SHARDS" << endl;
+    cout << "SHARDS: " << endl;
     for(i=0;i<n;i++){
         cout << "Shard " << i+1 << "  Pos: " << obj[i].posH << " " << obj[i].posV << "  Ganho: " << obj[i].rShard << endl;
         cout << "Custo H: " << obj[i].cH << " Custo V: " << obj[i].cV << endl << endl;
