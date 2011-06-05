@@ -1,0 +1,28 @@
+/* [mn27] - Dado um grafo determinar o mínimo k para o qual G tem uma k-coloração */
+
+/* conjunto de vertices */
+set V;
+
+/* conjunto de arestas - Produto cartesiano(cross) de V com V*/
+set E, within V cross V;
+
+/* atribui para o numero maximo de cores numero de vertices do grafo */
+param p, integer := sum{i in V}1;
+
+/* indica se a cor i foi usada ou nao */
+var cor{i in 1..p}, binary;
+
+/* indica se o vertice i levou a cor j */
+var x{i in V, j in 1..p}, binary;
+
+/* restringe o numero de cores de um vertice como sendo exatamente 1 */
+s.t. unicidade{i in V}: sum{c in 1..p}x[i,c] = 1;
+
+/* restringe dois vertices adjacentes a terem cores diferentes */
+s.t. adjacencia{(i,j) in E, c in 1..p}: x[i,c] + x[j,c] <= 1;
+
+/* quando uma cor for usada em algum vertice, ela deve ser marcada como usada */
+s.t. uso{i in V, c in 1..p}: x[i,c] <= cor[c];
+
+/* minimiza a soma de cores usadas */
+minimize objetivo: sum{c in 1..p}cor[c];

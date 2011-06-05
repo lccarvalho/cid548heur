@@ -10,20 +10,15 @@ set E, within V cross V;
 /* Variável binária que diz se aresta i está ou não no emparelhamento */
 var x{(i,j) in E}, binary;
 
-/* As quatro constraints abaixo garantem que dois vértices adjacentes nunca estarão no emparelhamento */
-s.t. vizinhoA{(i,j) in E, (i,k) in E diff {(i,j)}}: x[i,j] + x[i,k] <= 1;
-s.t. vizinhoB{(i,j) in E, (k,j) in E diff {(i,j)}}: x[i,j] + x[k,j] <= 1;
-s.t. vizinhoC{(i,j) in E, (k,i) in E diff {(i,j)}}: x[i,j] + x[k,i] <= 1;
-s.t. vizinhoD{(i,j) in E, (j,k) in E diff {(i,j)}}: x[i,j] + x[j,k] <= 1;
+/* A constraint abaixo garante que dois vértices adjacentes nunca estarão no emparelhamento */
+s.t. vizinhoA{u in V}: sum{i in V: (i,u) in E}x[i,u] + sum{j in V: (u,j) in E}x[u,j] <= 1;
 
 /* Essa constraint garante a maximalidade, ou seja, para cada aresta, entre ela e suas vizinhas */
 /* devemos ter ao menos uma que faça parte do emparelhamento (pois se não houvesse, poderiamos  */
 /* adicionar a aresta corrente no emparelhamento, e portanto não seria maximal */
-s.t. maximal{(i,j) in E}: x[i,j] + 
-     sum{(i,k) in E} x[i,k] +
-     sum{(k,i) in E} x[k,i] +
-     sum{(k,j) in E} x[k,j] +
-     sum{(j,k) in E} x[j,k] >= 1;
+s.t. maximal{(i,j) in E}:x[i,j] + 
+            sum{u in V: (i,u) in E and u != j}x[i,u] +
+            sum{u in V: (u,j) in E and u != i}x[u,j] >= 1;
 
 /* A função objetivo minimiza o número de arestas no emparelhamento*/
 minimize objetivo: sum{(i,j) in E} x[i,j];
