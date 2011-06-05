@@ -1,0 +1,37 @@
+/* [gt54] - caminho minimo entre um par de vertices, de forma que este tenha no maximo um */
+/* vertice de cada par de C */
+
+/* conjunto de vertices */
+set V;
+
+/* conjunto de arestas - tomada do produto cartesiano (cross) dos elementos de V */
+set A, within V cross V;
+
+/* conjunto dos pares de vertices proibidos */
+set C, within V cross V;
+
+/* vertice fonte */
+param s;
+
+/* vertice destino */
+param t;
+
+/* custo da aresta (i,j) */
+param c{(i,j) in A};
+
+var x{(i,j) in A}, binary;
+
+/* garante que pra todo vertice do caminho, o # de vertices que entram e igual ao que sai */
+/* (exceto fonte e destino)*/
+s.t. caminho{u in V: u != s and u != t}: sum{i in V: (i,u) in A}x[i,u] = sum{j in V: (u,j) in A}x[u,j];
+
+/* Garante que o caminho tenha no maximo um vertice de cada par de C */
+s.t. pares{(i,j) in C}: sum{u in V: (i,u) in A}x[i,u] + sum{u in V: (u,j) in A}x[u,j] <= 1;
+
+/* Garante que o vertice inicial eh o vertice fonte */
+s.t. source: sum{j in V: (s,j) in A}x[s,j] = 1;
+
+/* Garante que o vertice final eh o vertice destino */
+s.t. target: sum{i in V: (i,t) in A}x[i,t] = 1;
+
+minimize objetivo: sum{(i,j) in A}x[i,j]*c[i,j];
