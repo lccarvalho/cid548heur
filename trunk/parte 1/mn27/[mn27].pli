@@ -3,11 +3,14 @@
 /* conjunto de vertices */
 set V;
 
-/* conjunto de arestas - Produto cartesiano(cross) de V com V*/
+/* conjunto de arestas - Produto cartesiano(cross) de V com V */
 set E, within V cross V;
 
-/* atribui para o numero maximo de cores numero de vertices do grafo */
-param p, integer := sum{i in V}1;
+param d{i in V}, integer := sum{u in V: (u,i) in E}1 + sum{u in V: (i,u) in E}1;
+
+/* atribui para o numero maximo de cores o grau maximo do grafo + 1. Obs.: Existe um resultado em coloração que  */
+/* garante que o índice cromático de um grafo qualquer é sempre menor ou igual ao  grau máximo deste somado de 1 */
+param p, integer := 1 + max{i in V}d[i];
 
 /* indica se a cor i foi usada ou nao */
 var cor{i in 1..p}, binary;
