@@ -33,3 +33,6 @@ s.t. demanda:sum{i in V: i != t and (i,t) in A}flow[i,t] >= R;
 
 minimize objetivo:sum{(i,j) in A}flow[i,j]*p[i,j];
 
+solve;
+
+printf "%d", objetivo > "nd32.out";
