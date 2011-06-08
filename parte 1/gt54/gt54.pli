@@ -35,3 +35,7 @@ s.t. source: sum{j in V: (s,j) in A}x[s,j] = 1;
 s.t. target: sum{i in V: (i,t) in A}x[i,t] = 1;
 
 minimize objetivo: sum{(i,j) in A}x[i,j]*c[i,j];
+
+solve;
+
+printf "%d", objetivo > "gt54.out";

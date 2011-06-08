@@ -29,3 +29,7 @@ s.t. uso{i in V, c in 1..p}: x[i,c] <= cor[c];
 
 /* minimiza a soma de cores usadas */
 minimize objetivo: sum{c in 1..p}cor[c];
+
+solve;
+
+printf "%d", objetivo > "mn27.out";
