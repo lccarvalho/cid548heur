@@ -1,37 +1,45 @@
 /* [nd32] - Dado um grafo orientado G e dois vértices, um fonte(s) e um destino(t), calcular o fluxo viável de  */
 /* s para t que minimize o fluxo total */
 
-/* Conjunto de vertices */
+/* conjunto de vertices */
 set V;
 
-/* Conjunto de arestas - produto cartesiano do conjunto de vertices */
+/* conjunto de arestas - subconjunto do produto cartesiano (cross) dos elementos de V */
 set A, within V cross V;
 
-/* Capacidade da aresta (i,j) */
+/* capacidade da aresta (i,j) */
 param c{(i,j) in A};
 
-/* Custo de utilizaçao da aresta (i,j) */
+/* custo de utilizaçao da aresta (i,j) */
 param p{(i,j) in A};
 
-/* Vertice fonte */
+/* vertice fonte */
 param s;
 
-/* Vertice destino */
+/* vertice destino */
 param t;
 
-/* Demanda em t */
+/* demanda em t */
 param R;
 
-
+/* variável indica a quantidade de fluxo que passa em uma aresta */
 var flow{(i,j) in A}, integer, >= 0;
 
-s.t. capacidade{(i,j) in A}:flow[i,j] <= c[i,j];
+/* variável indica se fluxo passa ou não em uma aresta */
+var x{(i,j) in A}, binary;
 
+/* impede que o fluxo em uma aresta estoure sua capacidade, e garante que se passar fluxo nessa aresta */
+/* então seu x será igual a 1 */
+s.t. capacidade{(i,j) in A}:flow[i,j] <= c[i,j]*x[i,j];
+
+/* constraint que garante a conservação de fluxo */
 s.t. inout{v in V: v != s and v != t}: sum{i in V: (i,v) in A}flow[i,v] = sum{j in V: (v,j) in A}flow[v,j];
 
-s.t. demanda:sum{i in V: i != t and (i,t) in A}flow[i,t] >= R;
+/* constraint que garante que seja atendida a demanada em t */
+s.t. demanda:sum{i in V: i != t and (i,t) in A}flow[i,t] = R;
 
-minimize objetivo:sum{(i,j) in A}flow[i,j]*p[i,j];
+/* minimiza o custo referente a arestas usadas */
+minimize objetivo:sum{(i,j) in A}x[i,j]*p[i,j];
 
 solve;
 

@@ -3,7 +3,7 @@
 /* conjunto de vertices */
 set V;
 
-/* conjunto de arestas - Produto cartesiano(cross) de V com V */
+/* conjunto de arestas - subconjunto do produto cartesiano (cross) dos elementos de V */
 set E, within V cross V;
 
 param d{i in V}, integer := sum{u in V: (u,i) in E}1 + sum{u in V: (i,u) in E}1;
