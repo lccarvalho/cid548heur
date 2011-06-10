@@ -1,0 +1,55 @@
+/* [ss2] - Escalonamento de tarefas de forma a minimizar as tarefas que terminem foram do prazo */
+
+/* numero de tarefas */
+param n;
+
+/* tarefas*/
+set A := {1..n};
+
+/* pares de tarefas (i,j) de forma que i deve ser executada antes de j */
+set S, within A cross A;
+
+/* tempo de execuçao de cada tarefa */
+param t{i in A};
+
+/* deadline de cada tarefa */
+param d{i in A};
+
+/* variavel que indica se a tarefa i estoura ou nao o deadline. 1 se estoura, 0 se nao*/
+var x{i in A}, binary;
+
+/* variavel que indica o inicio da tarefa i */
+var sigma{i in A}, integer, >=0;
+
+/* indica se a tarefa i precede a variavel j. Nao existe para elementos de S */
+var prec{(i,j) in A cross A: i != j and (i,j) not in S}, binary;
+
+/* representa um número muito grande. Seu valor é definido como soma dos deadlines. Tal valor foi */
+/* definido experimentalmente, ou seja, testado até que encontrado um que valesse para as instâncias */
+/* dadas */
+param M := sum{i in A}d[i];
+
+
+/* as três constraints abaixo controlam as precedências das tarefas que NÃO estão em S.*/
+s.t. precedencia1{i in A, j in A: i != j and (i,j) not in S and (j,i) not in S}: prec[i,j] + prec[j,i] = 1;
+
+s.t. precedencia2{i in A, j in A: (i,j) not in S and (j,i) not in S and i != j}: 
+                                   sigma[i] + t[i] <= sigma[j] + (1 - prec[i,j])*M;
+
+s.t. precedencia3{i in A, j in A: (i,j) not in S and (j,i) not in S and i != j}:
+                                   sigma[j] + t[j] <= sigma[i] + prec[i,j]*M;
+
+/* essa constraint garante a precedencia dos pares de tarefas que estão em S */
+s.t. serie{(i,j) in S}: sigma[i] + t[i] <= sigma[j];
+
+/* essa constraint que se uma tarefa i termina depois do deadline, então x[i] = 1 e, caso cvontrário, */
+/* x[i] = 0 */
+s.t. termino1{i in A}: d[i] - sigma[i] - t[i] <= (1 - x[i])*M;
+s.t. termino2{i in A}: d[i] - sigma[i] - t[i] >= -x[i]*M;
+
+/* minimiza a soma das tarefas que acabam depois do deadline */
+minimize objetivo: sum{i in 1..n}x[i];
+
+solve;
+
+printf "%d", objetivo > "ss2.out";
