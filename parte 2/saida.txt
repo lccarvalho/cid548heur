@@ -1,1 +1,113 @@
+SATELITES: 
+satelite H 13 Pos Vetor: 0: Memoria Total: 5
+satelite H 1 Pos Vetor: 1: Memoria Total: 32
+satelite H 2 Pos Vetor: 2: Memoria Total: 32
+satelite H 3 Pos Vetor: 3: Memoria Total: 32
+satelite H 4 Pos Vetor: 4: Memoria Total: 32
+satelite H 5 Pos Vetor: 5: Memoria Total: 32
+satelite H 7 Pos Vetor: 6: Memoria Total: 32
+satelite H 8 Pos Vetor: 7: Memoria Total: 32
+satelite H 9 Pos Vetor: 8: Memoria Total: 32
+satelite H 10 Pos Vetor: 9: Memoria Total: 32
+satelite H 11 Pos Vetor: 10: Memoria Total: 32
+satelite H 14 Pos Vetor: 11: Memoria Total: 32
+satelite H 15 Pos Vetor: 12: Memoria Total: 32
+satelite H 16 Pos Vetor: 13: Memoria Total: 32
+satelite H 12 Pos Vetor: 14: Memoria Total: 36
+satelite H 6 Pos Vetor: 15: Memoria Total: 64
+
+SHARDS: 
+Shard 1  Pos: 5 5  Ganho: 25
+Custo H: 16 Custo V: 4
+Relacao custo memoria: 6.25
+
+Shard 2  Pos: 5 4  Ganho: 8
+Custo H: 16 Custo V: 4
+Relacao custo memoria: 2
+
+Shard 3  Pos: 5 1  Ganho: 5
+Custo H: 16 Custo V: 6
+Relacao custo memoria: 0.833333
+
+Shard 4  Pos: 4 7  Ganho: 12
+Custo H: 16 Custo V: 16
+Relacao custo memoria: 0.75
+
+Shard 5  Pos: 4 4  Ganho: 10
+Custo H: 16 Custo V: 16
+Relacao custo memoria: 0.625
+
+Shard 6  Pos: 3 1  Ganho: 8
+Custo H: 16 Custo V: 16
+Relacao custo memoria: 0.5
+
+Shard 7  Pos: 6 3  Ganho: 4
+Custo H: 16 Custo V: 12
+Relacao custo memoria: 0.333333
+
+Shard 8  Pos: 3 4  Ganho: 4
+Custo H: 16 Custo V: 16
+Relacao custo memoria: 0.25
+
+Shard 9  Pos: 6 6  Ganho: 3
+Custo H: 16 Custo V: 12
+Relacao custo memoria: 0.25
+
+Shard 10  Pos: 6 8  Ganho: 2
+Custo H: 16 Custo V: 12
+Relacao custo memoria: 0.166667
+
+
+Shard lida: 5 5
+Satelite leitor: 13
+Tam Vertical: 4
+Mem. Restante Sat Leitor: 5
+
+Shard lida: 3 1
+Satelite leitor: 3
+Tam Horizontal: 16
+Mem. Restante Sat Leitor: 32
+
+Shard lida: 3 4
+Satelite leitor: 3
+Tam Horizontal: 16
+Mem. Restante Sat Leitor: 16
+
+Shard lida: 4 7
+Satelite leitor: 4
+Tam Horizontal: 16
+Mem. Restante Sat Leitor: 32
+
+Shard lida: 4 4
+Satelite leitor: 4
+Tam Horizontal: 16
+Mem. Restante Sat Leitor: 16
+
+Shard lida: 5 4
+Satelite leitor: 5
+Tam Horizontal: 16
+Mem. Restante Sat Leitor: 32
+
+Shard lida: 5 1
+Satelite leitor: 5
+Tam Horizontal: 16
+Mem. Restante Sat Leitor: 16
+
+Shard lida: 6 3
+Satelite leitor: 11
+Tam Vertical: 12
+Mem. Restante Sat Leitor: 32
+
+Shard lida: 6 6
+Satelite leitor: 14
+Tam Vertical: 12
+Mem. Restante Sat Leitor: 32
+
+Shard lida: 6 8
+Satelite leitor: 16
+Tam Vertical: 12
+Mem. Restante Sat Leitor: 32
+
+
+Objetivo: 81
 
