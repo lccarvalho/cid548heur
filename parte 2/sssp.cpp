@@ -38,6 +38,8 @@ void build(vector<shard>& obj, vector<satelite>& sat){
     int Objetivo = 0;
     int nSat = sat.size()/2;
     int nSh = obj.size();
+    
+    cout << endl << "BUILD PELOS SATELITES" << endl << endl;
 
     for(int i = 0; i < 2*nSat; i++){
         for(int j = 0; j < nSh; j++){
@@ -134,6 +136,8 @@ void readIn(vector<shard>& obj, vector<satelite>& satH, vector<satelite>& satV, 
         getline(iss,tok,' ');
         seq = atoi(tok.c_str());
         sh.cV = seq;
+        sh.lida = false;
+        sh.lidaPor = -1;
         obj.insert(obj.end(),sh);
     
     }
