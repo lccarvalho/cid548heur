@@ -1,0 +1,44 @@
+/* PLI SSSP */
+
+set SH;
+
+set SV;
+
+param msh{i in SH};
+
+param msv{i in SV};
+
+set O;
+
+param posH{i in O};
+
+param posV{i in O};
+
+param rS{i in O};
+
+param cH{i in O};
+
+param cV{i in O};
+
+
+/* Indica se a shard i foi fotografada */
+var x{i in O}, binary;
+
+/* Indica se a shard i foi colocada no satélite horizontal j */
+var xh{i in O, j in SH}, binary;
+
+/* Indica se a shard i foi colocada no satélite vertical j */
+var xv{i in O, j in SV}, binary;
+
+
+maximize z: sum{i in O}x[i]*rS[i];
+
+s.t. satelite{i in O}: sum{j in SH}xh[i,j] + sum{j in SV}xv[i,j] = x[i];
+
+s.t. memoriah{j in SH}: sum{i in O}xh[i,j]*cH[i] <= msh[j];
+
+s.t. memoriav{j in SV}: sum{i in O}xv[i,j]*cV[i] <= msv[j];
+
+s.t. durr1{i in O}: sum{j in SH: j != posH[i]}xh[i,j] = 0;
+
+s.t. durr2{i in O}: sum{j in SV: j != posV[i]}xv[i,j] = 0;
