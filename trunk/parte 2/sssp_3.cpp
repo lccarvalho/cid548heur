@@ -79,7 +79,7 @@ int build(vector<shard>& obj, vector<satelite>& sat, int Objetivo){
             if(obj[j].posV == sat[i].ns && obj[j].lida == false){
                 if(sat[i].memRestante >= obj[j].cV){
                     obj[j].lida = true;
-                    obj[j].lidaPor = sat[i].ns;
+                    obj[j].lidaPor = i;
 //?????????         sat[i].shardsLidas.insert(shardsLidas.end(),obj[j]);
                     sat[i].memRestante -=  obj[j].cV;
                     Objetivo -= obj[j].rShard;
@@ -104,7 +104,7 @@ int build(vector<shard>& obj, vector<satelite>& sat, int Objetivo){
    */
 int readIn(vector<shard>& obj, vector<satelite>& satH,  char* entrada){
     ifstream arqin(entrada);
-    int n, m, seq, totalReward = 0, Collected = 0;
+    int n, m, seq, totalReward = 0;
     string tok, line;
     stringstream iss;
 
@@ -176,7 +176,7 @@ int readIn(vector<shard>& obj, vector<satelite>& satH,  char* entrada){
 int main(int argc, char* argv[]){
     ifstream entrada;
     ofstream saida;
-    int i, n, totalReward, toBeCollected;
+    int i, nSh, nSat, totalReward, toBeCollected, lastCollected = 0;
     vector<shard> obj;
     vector<satelite> satH;
     //vector<satelite> satV;
@@ -189,10 +189,10 @@ int main(int argc, char* argv[]){
     sort(satH.begin(),satH.end(),aZSat);
 
     //impressões para teste
-    cout << "SATELITES: " << endl;
+    nSat = satH.size();
+    cout << "SATELITES: " << nSat << endl;
     cout << "Num,PosVetor,Memoria Total" << endl;
-    n = satH.size();
-    for(i=0;i<n;i++){
+    for(i=0;i<nSat;i++){
         cout << satH[i].ns << "," << i << "," << satH[i].memRestante << endl;
     }
     
@@ -202,48 +202,23 @@ int main(int argc, char* argv[]){
     sort(obj.begin(), obj.end(), compShard);
     
     //impressões para teste 
-    n = obj.size();   
-    cout << "SHARDS: " << endl;
+    nSh = obj.size();   
+    cout << "SHARDS: " << nSh << endl;
     cout << "ShardH,ShardV,Ganho,CustoH,CustoV,MelhorCustoMemoria" << endl;
     
-    for(i=0;i<n;i++){
+    for(i=0;i<nSh;i++){
         cout << obj[i].posH << "," << obj[i].posV << "," << obj[i].rShard;
         cout << "," << obj[i].cH << "," << obj[i].cV;
         cout << "," << max(obj[i].rShard/obj[i].cH, obj[i].rShard/obj[i].cV) << endl;
     }
     cout << endl;
-
-
-// TESTES DE VALIDACAO DE BUILD
-/*
+    
     toBeCollected = build(obj, satH, toBeCollected);
-    cout << endl << "Shards" << endl;
-    cout << "ShardH,ShardV,Ganho,CustoH,CustoV,LidaPor" << endl;
-    for(int i = 0; i < obj.size(); i++){
-                 cout << obj[i].posH << "," << obj[i].posV << "," << obj[i].rShard;
-                 cout << "," << obj[i].cH << "," << obj[i].cV;
-                 cout << "," << obj[i].lidaPor << endl;
-    }
-    
-    cout << endl << "MemoriaRestante" << endl;        
-    cout << "Num,PosVetor,MemRestante" << endl;
-    for(int i=0;i<satH.size();i++){
-        cout << satH[i].ns << "," << i << "," << satH[i].memRestante << endl;
-    }
-    cout << endl << "Objetivo" << totalReward - toBeCollected << endl << endl;
-                      
-    return 0;
-*/
-
-    
-    
     while(improved && toBeCollected) {
           improved = false;
-          toBeCollected = build(obj, satH, toBeCollected);
-          cout << "TOTALREWARD: " << totalReward << endl << endl;
-          cout << "TOBECOLLECTED: " << toBeCollected << endl << endl;
+          cout << "TOTALREWARD: " << totalReward << endl;
+          cout << "TOBECOLLECTED: " << toBeCollected << endl;
           cout << "COLLECTED: " << totalReward - toBeCollected << endl << endl;
-          
           // se tem coisa a coletar:
                 // percorre os satélites na sequencia inversa da ordenação (maior para menor)
                    // percorre as shards
@@ -254,31 +229,38 @@ int main(int argc, char* argv[]){
                            //improved = true                           
                     
           if(toBeCollected) {
-                for(i=satH.size() ;i>0 ;i--){
-                      for(int j=0; j<obj.size(); j++){
+                for(i=nSat ;i>0 ;i--){
+                      for(int j=0; j<nSh; j++){
                               if(obj[j].posH == satH[i].ns || obj[j].posV == satH[i].ns){
-                                      if(satH[i].ns >  satH.size()/2 && obj[j].cV <= satH[i].memRestante) {
+                                      if(satH[i].ns >=  nSat/2 && obj[j].cV <= satH[i].memRestante) {
                                                satH[obj[j].lidaPor].memRestante += obj[j].cH;
                                                obj[j].lidaPor = i;
                                                satH[i].memRestante -= obj[j].cV;
-                                               improved = TRUE;
                                       }
-                                      if (satH[i].ns <= satH.size()/2 && obj[j].cH <= satH[i].memRestante){
+                                      if (satH[i].ns < nSat/2 && obj[j].cH <= satH[i].memRestante){
                                                satH[obj[j].lidaPor].memRestante += obj[j].cV;
                                                obj[j].lidaPor = i;
                                                satH[i].memRestante -= obj[j].cH;
-                                               improved = TRUE;
                                       }
                               }
                       }
                 }             
           
-          }   
-    }                
+          }
+          toBeCollected = build(obj, satH, toBeCollected);
+          if(lastCollected < (totalReward - toBeCollected)) improved = true;
+          else improved = false;
+          lastCollected = totalReward - toBeCollected;
+    }
+
+    cout << endl <<"FINAL" << endl;
+    cout << "[TOTALREWARD]: " << totalReward << endl;
+    cout << "[TOBECOLLECTED]: " << toBeCollected << endl;
+    cout << "[COLLECTED]: " << totalReward - toBeCollected << endl << endl;
 
     cout << endl << "Shards" << endl;
     cout << "ShardH,ShardV,Ganho,CustoH,CustoV,LidaPor" << endl;
-    for(int i = 0; i < obj.size(); i++){
+    for(int i = 0; i < nSh; i++){
                  cout << obj[i].posH << "," << obj[i].posV << "," << obj[i].rShard;
                  cout << "," << obj[i].cH << "," << obj[i].cV;
                  cout << "," << satH[obj[i].lidaPor].ns << endl;
@@ -286,7 +268,7 @@ int main(int argc, char* argv[]){
     
     cout << endl << "MemoriaRestante" << endl;        
     cout << "Num,PosVetor,MemRestante" << endl;
-    for(int i=0;i<satH.size();i++){
+    for(int i = 0;i < nSat;i++){
         cout << satH[i].ns << "," << i << "," << satH[i].memRestante << endl;
     }
     cout << endl << "Objetivo" << totalReward - toBeCollected << endl << endl;
