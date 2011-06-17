@@ -25,8 +25,8 @@ struct shard{
 
 struct satelite{
     int ns;            //Numero do satelite
-    int memTotal;      //Memoria total do satelite
-    int memRestante;   //Memoria restante do satelite
+    float memTotal;      //Memoria total do satelite
+    float memRestante;   //Memoria restante do satelite
 //???    vector<shard> shardsLidas;
 };
 
@@ -59,58 +59,40 @@ int build(vector<shard>& obj, vector<satelite>& sat, int Objetivo){
     int nSh = obj.size();
     
     //cout << endl << "BUILD PELOS SATELITES" << endl << endl;
-    cout << "ShardH ShardV Satelite TamH TamV MemRest" << endl;
+//    cout << "ShardH ShardV Satelite TamH TamV MemRest" << endl;
 
     for(int i = 0; i < 2*nSat; i++){
         for(int j = 0; j < nSh; j++){
-            if(obj[j].posH == sat[i].ns && obj[j].lida == false){
+            if(obj[j].posH == sat[i].ns && obj[j].lidaPor == false){
                 if(sat[i].memRestante >= obj[j].cH){   
-                    obj[j].lida = true;
+//                    obj[j].lida = true;
                     obj[j].lidaPor = i;
-//???????????       sat[i].shardsLidas.insert(shardsLidas.end(),obj[j]);
                     sat[i].memRestante -= (int) obj[j].cH;
                     Objetivo -= (int) obj[j].rShard;
-                    cout << obj[j].posH << " " << obj[j].posV << " ";
-                    cout << sat[i].ns << " ";
-                    cout << obj[j].cH << " " << obj[j].cV << " ";
-                    cout << sat[i].memRestante << endl;           
+//                    cout << obj[j].posH << " " << obj[j].posV << " ";
+  //                  cout << sat[i].ns << " ";
+    //                cout << obj[j].cH << " " << obj[j].cV << " ";
+      //              cout << sat[i].memRestante << endl;           
                 }
             }
 		
-            if(obj[j].posV == sat[i].ns && obj[j].lida == false){
+            if(obj[j].posV == sat[i].ns && obj[j].lidaPor == false){
                 if(sat[i].memRestante >= obj[j].cV){
-                    obj[j].lida = true;
+//                    obj[j].lida = true;
                     obj[j].lidaPor = i;
 //?????????         sat[i].shardsLidas.insert(shardsLidas.end(),obj[j]);
                     sat[i].memRestante -= (int) obj[j].cV;
                     Objetivo -= (int) obj[j].rShard;
-                    cout << obj[j].posH << " " << obj[j].posV << " ";
-                    cout << sat[i].ns << " ";
-                    cout << obj[j].cH << " " << obj[j].cV << " ";
-                    cout << sat[i].memRestante << endl;              
+//                    cout << obj[j].posH << " " << obj[j].posV << " ";
+  //                  cout << sat[i].ns << " ";
+    //                cout << obj[j].cH << " " << obj[j].cV << " ";
+      //              cout << sat[i].memRestante << endl;              
 
                 }
             }
         }  
     }
     
-    cout << endl << "ShardsNaoLidas" << endl;
-    cout << "ShardH ShardV  Ganho: CustoH:  CustoV: MelhorCustoMemoria: " << endl;
-    for(int i = 0; i < nSh; i++){
-            if(obj[i].lida == false){
-                 cout << obj[i].posH << " " << obj[i].posV << "  " << obj[i].rShard;
-                 cout << " " << obj[i].cH << " " << obj[i].cV;
-                 cout << " " << max(obj[i].rShard/obj[i].cH, obj[i].rShard/obj[i].cV) << endl;
-            }
-    }
-    
-    cout << endl << "MemoriaRestante" << endl;        
-    cout << "Num PosVetor:  MemRestante: " << endl;
-
-    for(int i=0;i<nSat;i++){
-        cout << sat[i].ns << " " << i << " " << sat[i].memRestante << endl;
-    }
-    cout << endl << "Objetivo: " << Objetivo << endl << endl;
     return Objetivo;
 
 }/* build */
@@ -179,8 +161,9 @@ int readIn(vector<shard>& obj, vector<satelite>& satH,  char* entrada){
         getline(iss,tok,' ');
         seq = atoi(tok.c_str());
         sh.cV = seq;
-        sh.lida = false;
-        sh.lidaPor = -1;
+//        sh.lida = false;
+//        sh.lidaPor = -1;
+        sh.lidaPor = 0;
         obj.insert(obj.end(),sh);
     
     }
@@ -207,10 +190,10 @@ int main(int argc, char* argv[]){
 
     //impressões para teste
     cout << "SATELITES: " << endl;
-    cout << "Num PosVetor:  Memoria Total: " << endl;
+    cout << "Num;PosVetor;Memoria Total" << endl;
     n = satH.size();
     for(i=0;i<n;i++){
-        cout << satH[i].ns << " " << i << " " << satH[i].memRestante << endl;
+        cout << satH[i].ns << ";" << i << ";" << satH[i].memRestante << endl;
     }
     
     cout << endl;
@@ -221,42 +204,69 @@ int main(int argc, char* argv[]){
     //impressões para teste 
     n = obj.size();   
     cout << "SHARDS: " << endl;
-    cout << "ShardH ShardV  Ganho: CustoH:  CustoV: MelhorCustoMemoria: " << endl;
+    cout << "ShardH;ShardV;Ganho;CustoH;CustoV;MelhorCustoMemoria" << endl;
     
     for(i=0;i<n;i++){
-        cout << obj[i].posH << " " << obj[i].posV << "  " << obj[i].rShard;
-        cout << " " << obj[i].cH << " " << obj[i].cV;
-        cout << " " << max(obj[i].rShard/obj[i].cH, obj[i].rShard/obj[i].cV) << endl;
+        cout << obj[i].posH << ";" << obj[i].posV << ";" << obj[i].rShard;
+        cout << ";" << obj[i].cH << ";" << obj[i].cV;
+        cout << ";" << max(obj[i].rShard/obj[i].cH, obj[i].rShard/obj[i].cV) << endl;
     }
     cout << endl;
     
     
     while(improved && toBeCollected) {
           improved = false;         
-          toBeCollected = build(obj, satH, toBeCollected);
+          toBeCollected = totalReward - build(obj, satH, toBeCollected);
+          cout << "TOBECOLLECTED: " << toBeCollected << endl << endl;
           
           // se tem coisa a coletar:
-                // ordena os satélites em ordem decrescente de memRestante
-                // puxa o quanto der de shards de outros satélites para este
-                        //troca o lidoPor e atualiza as capacidades dos satélites
-                        // se puxar alguma coisa fala que improved = true
-                //ordena de novo os satélites da menor para a maior capacidade
+                // percorre os satélites na sequencia inversa da ordenação (maior para menor)
+                   // percorre as shards
+                      //se for "lível" pelo satélite e se tamanho < memRestante
+                           //troca lida por para o satélite
+                           //subtrai tamanho de memRestante
+                           //soma o tamanho (na direção correta) no satélite que tinha lido antes
+                           //improved = true                           
+                    
           if(toBeCollected) {
-                sort(satH.begin(),satH.end(),zASat);
-                for(i=0;i<n;i++){
-                      for(int j=i+1; j<n; j++){
-                              //SATÉLITE i ROUBA QUANTAS SHARDS DER DE j 
-                              //PRECISA COLOCAR UM PONTEIRO PARA AS SHARDS LIDAS NO SATÉLITE
+                for(i=satH.size() ;i>0 ;i--){
+                      for(int j=0; j<obj.size(); j++){
+                              if(obj[j].posH == satH[i].ns || obj[j].posV == satH[i].ns){
+                                      if(satH[i].ns >  satH.size()/2 && obj[j].cV <= satH[i].memRestante) {
+                                               satH[obj[j].lidaPor].memRestante += obj[j].cH;
+                                               obj[j].lidaPor = satH[i].ns;
+                                               satH[i].memRestante -= obj[j].cV;
+                                               improved = TRUE;
+                                      }
+                                      if (satH[i].ns <= satH.size()/2 && obj[j].cH <= satH[i].memRestante){
+                                               satH[obj[j].lidaPor].memRestante += obj[j].cV;
+                                               obj[j].lidaPor = satH[i].ns;
+                                               satH[i].memRestante -= obj[j].cH;
+                                               improved = TRUE;
+                                      }
+                              }
                       }
                 }             
           
           }   
-          //COMO RECUPERAR A ORDEM ORIGINAL DOS SATÉLITES ?????         
     }                
-                
-          
-          
 
+    cout << endl << "Shards" << endl;
+    cout << "ShardH;ShardV;Ganho;CustoH;CustoV;LidaPor" << endl;
+    for(int i = 0; i < obj.size(); i++){
+                 cout << obj[i].posH << ";" << obj[i].posV << ";" << obj[i].rShard;
+                 cout << ";" << obj[i].cH << ";" << obj[i].cV;
+                 cout << ";" << obj[i].lidaPor << endl;
+    }
+    
+    cout << endl << "MemoriaRestante" << endl;        
+    cout << "Num;PosVetor;MemRestante" << endl;
+    for(int i=0;i<satH.size();i++){
+        cout << satH[i].ns << ";" << i << ";" << satH[i].memRestante << endl;
+    }
+    cout << endl << "Objetivo" << totalReward - toBeCollected << endl << endl;
+                      
     return 0;
+ 
 }
 
