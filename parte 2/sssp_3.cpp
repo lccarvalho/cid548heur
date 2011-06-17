@@ -67,7 +67,7 @@ int build(vector<shard>& obj, vector<satelite>& sat, int Objetivo){
                 if(sat[i].memRestante >= obj[j].cH){   
                     obj[j].lida = true;
                     obj[j].lidaPor = i;
-                    sat[i].memRestante -= (int) obj[j].cH;
+                    sat[i].memRestante -=  obj[j].cH;
                     Objetivo -= obj[j].rShard;
 //                    cout << obj[j].posH << " " << obj[j].posV << " ";
   //                  cout << sat[i].ns << " ";
@@ -79,9 +79,9 @@ int build(vector<shard>& obj, vector<satelite>& sat, int Objetivo){
             if(obj[j].posV == sat[i].ns && obj[j].lida == false){
                 if(sat[i].memRestante >= obj[j].cV){
                     obj[j].lida = true;
-                    obj[j].lidaPor = i;
+                    obj[j].lidaPor = sat[i].ns;
 //?????????         sat[i].shardsLidas.insert(shardsLidas.end(),obj[j]);
-                    sat[i].memRestante -= (int) obj[j].cV;
+                    sat[i].memRestante -=  obj[j].cV;
                     Objetivo -= obj[j].rShard;
 //                    cout << obj[j].posH << " " << obj[j].posV << " ";
   //                  cout << sat[i].ns << " ";
@@ -212,6 +212,29 @@ int main(int argc, char* argv[]){
         cout << "," << max(obj[i].rShard/obj[i].cH, obj[i].rShard/obj[i].cV) << endl;
     }
     cout << endl;
+
+
+// TESTES DE VALIDACAO DE BUILD
+/*
+    toBeCollected = build(obj, satH, toBeCollected);
+    cout << endl << "Shards" << endl;
+    cout << "ShardH,ShardV,Ganho,CustoH,CustoV,LidaPor" << endl;
+    for(int i = 0; i < obj.size(); i++){
+                 cout << obj[i].posH << "," << obj[i].posV << "," << obj[i].rShard;
+                 cout << "," << obj[i].cH << "," << obj[i].cV;
+                 cout << "," << obj[i].lidaPor << endl;
+    }
+    
+    cout << endl << "MemoriaRestante" << endl;        
+    cout << "Num,PosVetor,MemRestante" << endl;
+    for(int i=0;i<satH.size();i++){
+        cout << satH[i].ns << "," << i << "," << satH[i].memRestante << endl;
+    }
+    cout << endl << "Objetivo" << totalReward - toBeCollected << endl << endl;
+                      
+    return 0;
+*/
+
     
     
     while(improved && toBeCollected) {
@@ -236,13 +259,13 @@ int main(int argc, char* argv[]){
                               if(obj[j].posH == satH[i].ns || obj[j].posV == satH[i].ns){
                                       if(satH[i].ns >  satH.size()/2 && obj[j].cV <= satH[i].memRestante) {
                                                satH[obj[j].lidaPor].memRestante += obj[j].cH;
-                                               obj[j].lidaPor = satH[i].ns;
+                                               obj[j].lidaPor = i;
                                                satH[i].memRestante -= obj[j].cV;
                                                improved = TRUE;
                                       }
                                       if (satH[i].ns <= satH.size()/2 && obj[j].cH <= satH[i].memRestante){
                                                satH[obj[j].lidaPor].memRestante += obj[j].cV;
-                                               obj[j].lidaPor = satH[i].ns;
+                                               obj[j].lidaPor = i;
                                                satH[i].memRestante -= obj[j].cH;
                                                improved = TRUE;
                                       }
@@ -258,7 +281,7 @@ int main(int argc, char* argv[]){
     for(int i = 0; i < obj.size(); i++){
                  cout << obj[i].posH << "," << obj[i].posV << "," << obj[i].rShard;
                  cout << "," << obj[i].cH << "," << obj[i].cV;
-                 cout << "," << obj[i].lidaPor << endl;
+                 cout << "," << satH[obj[i].lidaPor].ns << endl;
     }
     
     cout << endl << "MemoriaRestante" << endl;        
