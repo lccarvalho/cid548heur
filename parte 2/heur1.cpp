@@ -5,6 +5,7 @@
 #include <sstream>
 #include <vector>
 #include <algorithm>
+#include <time.h>
 
 #define TRUE 1
 #define FALSE 0
@@ -154,6 +155,7 @@ int readIn(vector<shard>& obj, vector<satelite>& satH,  char* entrada){
 
 int main(int argc, char* argv[]){
     int i, n, totalReward, toBeCollected, previousToBeCollected;
+    float startTime, totalTime;
     vector<shard> shard;
     vector<satelite> sat;
     int changed = TRUE;
@@ -164,7 +166,7 @@ int main(int argc, char* argv[]){
     sort(sat.begin(),sat.end(),aZSat);
 
     //impressões para teste
-    cout << "SATELITES: " << endl;
+/*    cout << "SATELITES: " << endl;
     cout << "Num,PosVetor,Memoria Total" << endl;
     n = sat.size();
     for(i=0;i<n;i++){
@@ -172,28 +174,27 @@ int main(int argc, char* argv[]){
     }
     
     cout << endl;
-    
+  */  
 
     sort(shard.begin(), shard.end(), compShard);
     
     //impressões para teste 
     n = shard.size();   
-    cout << "SHARDS: " << endl;
+/*    cout << "SHARDS: " << endl;
     cout << "ShardH,ShardV,Ganho,CustoH,CustoV" << endl;
-    
+  */  
     for(i=0;i<n;i++){
         cout << shard[i].posH << "," << shard[i].posV << "," << shard[i].rShard;
         cout << "," << shard[i].cH << "," << shard[i].cV << endl;
     }
     cout << endl;
 
+    startTime = clock();
     
-    while(changed && toBeCollected && toBeCollected < previousToBeCollected) {
-          changed = FALSE;
-          previousToBeCollected = toBeCollected;
-          
-          toBeCollected = build(shard, sat, toBeCollected);
-          
+    toBeCollected = build(shard, sat, toBeCollected);
+    
+    totalTime = clock() - startTime;
+/*          
           
           cout << "TOTALREWARD: " << totalReward << endl;
           cout << "TOBECOLLECTED: " << toBeCollected << endl;
@@ -229,7 +230,7 @@ int main(int argc, char* argv[]){
           
           }   
     }                
-
+*/
     cout << endl << "Shards" << endl;
     cout << "ShardH,ShardV,Ganho,CustoH,CustoV,LidaPor" << endl;
     for(int i = 0; i < shard.size(); i++){
@@ -243,7 +244,14 @@ int main(int argc, char* argv[]){
     for(int i=0;i<sat.size();i++){
         cout << sat[i].ns << "," << i << "," << sat[i].memRestante << endl;
     }
+    
+    cout << endl << "Satelites" << sat.size() << endl << endl;
+    cout << endl << "Shards" << shard.size() << endl << endl;
     cout << endl << "Objetivo" << totalReward - toBeCollected << endl << endl;
+    cout << endl << "Maximo" << totalReward << endl << endl;
+    cout << endl << "Time" << totalTime << endl << endl;
+    
+    
                       
     return 0;
  
