@@ -210,14 +210,14 @@ int main(int argc, char* argv[]){
                                   shard[j].lidaPor < i ){
                                                    
                                       //satélite "vertical", tem espaço para a shard: faz a troca       
-                                      if(sat[i].ns >  sat.size()/2 && shard[j].cV <= sat[i].memRestante) {
+                                      if(sat[i].ns >=  sat.size()/2 && shard[j].cV <= sat[i].memRestante) {
                                                sat[shard[j].lidaPor].memRestante += shard[j].cH;
                                                shard[j].lidaPor = i;
                                                sat[i].memRestante -= shard[j].cV;
                                                changed = TRUE;
                                       }
                                       //satélite "horizontal", idem acima
-                                      if (sat[i].ns <= sat.size()/2 && shard[j].cH <= sat[i].memRestante){
+                                      if (sat[i].ns < sat.size()/2 && shard[j].cH <= sat[i].memRestante){
                                                sat[shard[j].lidaPor].memRestante += shard[j].cV;
                                                shard[j].lidaPor = i;
                                                sat[i].memRestante -= shard[j].cH;
