@@ -38,22 +38,21 @@ bool compShard(shard shard1, shard shard2){
     return max(shard1.rShard/shard1.cH, shard1.rShard/shard1.cV) > max(shard2.rShard/shard2.cH, shard2.rShard/shard2.cV);
 }
 
-
 void answer(vector<shard>& shards, vector<satelite>& sat, int Objetivo, int rdShards, char* out){
-    FILE *arqout;
+    ofstream arqout(out);
     int nSh = shards.size(), nSat = sat.size();
 
-    arqout = fopen(out,"w");
-    fprintf(arqout,"%d\n%d\n", Objetivo, rdShards);
+    arqout << Objetivo << endl << rdShards << endl;
 
     for(int i=0;i<nSh;i++){
         if(shards[i].lidaPor !=0)
-            fprintf(arqout,"%d %d ", shards[i].posH, shards[i].posV);
-            if(sat[shards[i].lidaPor].ns <= (nSat/2)) fprintf(arqout,"%c\n", 'h');
-            else fprintf(arqout,"%c\n", 'v');
+            arqout << shards[i].posH << " " << shards[i].posV << " ";
+            if(sat[shards[i].lidaPor].ns <= (nSat/2)) arqout << "h" << endl;
+            else arqout << "v" << endl;
     }
 
-    fclose(arqout);
+    arqout.close();
+    return;
 }
 
 
