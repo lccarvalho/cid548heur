@@ -5,12 +5,12 @@
 #include <sstream>
 #include <vector>
 #include <algorithm>
+#include <random>
 
 #define TRUE 1
 #define FALSE 0
 
 using namespace std;
-
 
 /* definição das structs*/
 struct shard{
@@ -28,6 +28,32 @@ struct satelite{
     int memTotal;      //Memoria total do satelite
     int memRestante;   //Memoria restante do satelite
 };
+
+
+/* impressões para teste */
+void imprimeSat(vector<satelite>& sat){
+     
+    cout << "SATELITES: " << endl;
+    cout << "Num,PosVetor,MemTotal, MemRest" << endl;
+    int n = sat.size();
+    for(int i=0;i<n;i++){
+        cout << sat[i].ns << "," << i << "," << sat[i].memTotal << "," << sat[i].memRestante << endl;
+    }    
+    cout << endl;
+}
+
+void imprimeShard(vector<shard>& shard){
+     
+    int n = shard.size();   
+    cout << "SHARDS: " << endl;
+    cout << "PosVetor,ShardH,ShardV,Ganho,CustoH,CustoV,Lida,LidaPor" << endl;
+    
+    for(int i=0;i<n;i++){
+        cout << i << "," << shard[i].posH << "," << shard[i].posV << "," << shard[i].rShard;
+        cout << "," << shard[i].cH << "," << shard[i].cV << "," << shard[i].lida << "," << shard[i].lidaPor << endl;
+    }
+    cout << endl;
+}/* impressões para teste */
 
 /* funções auxiliares de ordenação */
 bool aZSat(satelite sat1, satelite sat2){
@@ -147,32 +173,46 @@ int build(vector<shard>& shard, vector<satelite>& sat, int toCollect){
 
 }/* build */
 
-/* impressões para teste */
-void imprimeSat(vector<satelite>& sat){
+void volta1(vector<shard>& shard, vector<satelite>& sat, int * toBeCollected) {
      
-    cout << "SATELITES: " << endl;
-    cout << "Num,PosVetor,MemTotal, MemRest" << endl;
-    int n = sat.size();
-    for(int i=0;i<n;i++){
-        cout << sat[i].ns << "," << i << "," << sat[i].memTotal << "," << sat[i].memRestante << endl;
-    }    
-    cout << endl;
+    // percorre os satélites na sequencia inversa da ordenação inicial (maior para menor)            
+    for(int i=sat.size()-1 ;i>=0 ;i--){
+            // percorre as shards           
+            for(int j=0; j<=shard.size()-1; j++){
+                    //se for "lível" pelo satélite e tiver sido lida por um menor
+                    if((shard[j].posH == sat[i].ns || shard[j].posV == sat[i].ns) && shard[j].lidaPor < i ){
+                                      
+                            //satélite "vertical", tem espaço para a shard: faz a troca       
+                            if(sat[i].ns >  sat.size()/2 && shard[j].cV <= sat[i].memRestante && shard[j].lida == true) {
+                                 if(shard[j].lida == true)   
+                                     sat[shard[j].lidaPor].memRestante += shard[j].cH;
+                                 else *toBeCollected -= shard[j].rShard;
+                                 shard[j].lidaPor = i;
+                                 shard[j].lida = true;
+                                 sat[i].memRestante -= shard[j].cV;
+                            }
+                            //satélite "horizontal", idem acima
+                            if (sat[i].ns <= sat.size()/2 && shard[j].cH <= sat[i].memRestante && shard[j].lida == true){
+
+                                  if(shard[j].lida == true)        
+                                      sat[shard[j].lidaPor].memRestante += shard[j].cV;
+                                  else *toBeCollected -= shard[j].rShard;
+                                  shard[j].lidaPor = i;
+                                  shard[j].lida = true;
+                                  sat[i].memRestante -= shard[j].cH;
+
+                            }
+                    }
+            }
+    }             
 }
 
-void imprimeShard(vector<shard>& shard){
-     
-    int n = shard.size();   
-    cout << "SHARDS: " << endl;
-    cout << "PosVetor,ShardH,ShardV,Ganho,CustoH,CustoV,Lida,LidaPor" << endl;
+void trocaShards(vector<shard>& shard, vector<sat>& sat){
     
-    for(int i=0;i<n;i++){
-        cout << i << "," << shard[i].posH << "," << shard[i].posV << "," << shard[i].rShard;
-        cout << "," << shard[i].cH << "," << shard[i].cV << "," << shard[i].lida << "," << shard[i].lidaPor << endl;
-    }
-    cout << endl;
-}/* impressões para teste */
-
-
+    for(int i=0;i<shard.size();i++){
+        if(shard.lida == true && sat[shard[i].lidaPor].ns <= sat.size()/2 )
+    return;
+}
 
 
 int main(int argc, char* argv[]){
@@ -189,88 +229,48 @@ int main(int argc, char* argv[]){
 
     // TESTE
     cout << "Leitura:" << endl;
-    imprimeSat(sat);
-    imprimeShard(shard);
+    //imprimeSat(sat);
+    //imprimeShard(shard);
     cout << "toBeColl:," << toBeCollected << endl;
     
     loop = 0;
+
+    previousToBeCollected = toBeCollected;
+    
+    toBeCollected = build(shard, sat, toBeCollected);
+         
+          
+    //TESTE
+    cout << "Ida n.: " << loop << endl;
+    //imprimeSat(sat);
+    //imprimeShard(shard);
+    cout << "toBeColl:," << toBeCollected << endl;
         
-    while(changed && toBeCollected && toBeCollected < previousToBeCollected) {
-          changed = FALSE;
-          previousToBeCollected = toBeCollected;
+    while(toBeCollected && toBeCollected < previousToBeCollected) {
           
-          toBeCollected = build(shard, sat, toBeCollected);
-          
-          //TESTE
-          cout << "Ida n.: " << loop << endl;
-          imprimeSat(sat);
-          imprimeShard(shard);
-          cout << "toBeColl:," << toBeCollected << endl;
                   
           // se tem coisa a coletar:          
           if(toBeCollected) {
-                // percorre os satélites na sequencia inversa da ordenação inicial (maior para menor)            
-                for(i=sat.size()-1 ;i>=0 ;i--){
-                      // percorre as shards           
-                      for(int j=0; j<shard.size(); j++){
-                              //se for "lível" pelo satélite e tiver sido lida por um menor
-                              if((shard[j].posH == sat[i].ns || shard[j].posV == sat[i].ns) &&
-                                  shard[j].lidaPor < i ){
-                                      
-                                     /* cout << "i: " << i << " j: " << j << " sat[i].ns: " 
-                                           << sat[i].ns << " shard[j].posH: "
-                                           << shard[j].posH << " shard[j].posV: "
-                                           << shard[j].posV << "  shard[j].lidaPor: "
-                                           << shard[j].lidaPor << endl;
-                                           system("pause");                                 
-                                       */            
-                                      //satélite "vertical", tem espaço para a shard: faz a troca       
-                                      if(sat[i].ns >  sat.size()/2 && shard[j].cV <= sat[i].memRestante) {
-                                              /*     
-                                               cout << "shard[" << j << "] sai de sat[" << shard[j].lidaPor
-                                               << "] para sat[" << i << "]" << endl;
-                                               cout << "posH: " << shard[j].posH << " posV: " << shard[j].posV << endl;
-                                               cout << "antigo: " << sat[shard[j].lidaPor].ns << " novo: " <<
-                                               sat[i].ns << endl;
-                                               
-                                               cout << "mem. antigo - antes: " << sat[shard[j].lidaPor].memRestante
-                                               << " depois: " << sat[shard[j].lidaPor].memRestante + shard[j].cH << endl;
-                                               system("pause");
-                                               */
-                                               if(shard[j].lida == true)   
-                                                       sat[shard[j].lidaPor].memRestante += shard[j].cH;
-                                               shard[j].lidaPor = i;
-                                               shard[j].lida = true;
-                                               sat[i].memRestante -= shard[j].cV;
-                                               changed = TRUE;
-                                      }
-                                      //satélite "horizontal", idem acima
-                                      if (sat[i].ns <= sat.size()/2 && shard[j].cH <= sat[i].memRestante){
-                                               /*     
-                                               cout << "shard[" << j << "] sai de sat[" << shard[j].lidaPor
-                                               << "] para sat[" << i << "]" << endl;
-                                               cout << "posH: " << shard[j].posH << " posV: " << shard[j].posV << endl;
-                                               cout << "antigo: " << sat[shard[j].lidaPor].ns << " novo: " <<
-                                               sat[i].ns << endl;
-                                               system("pause");
-                                               */
-                                               if(shard[j].lida == true)        
-                                                       sat[shard[j].lidaPor].memRestante += shard[j].cV;
-                                               shard[j].lidaPor = i;
-                                               shard[j].lida = true;
-                                               sat[i].memRestante -= shard[j].cH;
-                                               changed = TRUE;
-                                      }
-                              }
-                      }
-                }             
-          
+                            
+                 volta1(shard, sat, &toBeCollected);
           }
+          
+          
           //TESTE
           cout << "Volta n.: " << loop << endl;
-          imprimeSat(sat);
-          imprimeShard(shard);
-          cout << "toBeColl:," << toBeCollected << endl; 
+          //imprimeSat(sat);
+          //imprimeShard(shard);
+          cout << "toBeColl:," << toBeCollected << endl;
+          
+          toBeCollected = build(shard, sat, toBeCollected);
+          
+          previousToBeCollected = toBeCollected;
+          
+          //TESTE
+          cout << "Ida n.: " << loop << endl;
+          //imprimeSat(sat);
+          //imprimeShard(shard);
+          cout << "toBeColl:," << toBeCollected << endl;
           
           loop++;  
     }                
