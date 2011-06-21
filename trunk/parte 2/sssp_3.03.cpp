@@ -35,7 +35,8 @@ bool aZSat(satelite sat1, satelite sat2){
 }
 
 bool compShard(shard shard1, shard shard2){
-    return max(shard1.rShard/shard1.cH, shard1.rShard/shard1.cV) > max(shard2.rShard/shard2.cH, shard2.rShard/shard2.cV);
+    return max((float)shard1.rShard/(float)shard1.cH, (float)shard1.rShard/(float)shard1.cV) 
+           > max((float)shard2.rShard/(float)shard2.cH, (float)shard2.rShard/(float)shard2.cV);
 }
 
 /* A função abre o arquivo de entrada, lê os parâmetros necessários, montando vetores de estruturas de satelites e
@@ -101,7 +102,7 @@ int readIn(vector<shard>& obj, vector<satelite>& satH,  char* entrada){
         seq = atoi(tok.c_str());
         sh.cV = seq;
         sh.lida = false;
-        sh.lidaPor = 0;
+        sh.lidaPor = -1;
         obj.insert(obj.end(),sh);
     
     }
@@ -146,9 +147,36 @@ int build(vector<shard>& shard, vector<satelite>& sat, int toCollect){
 
 }/* build */
 
+/* impressões para teste */
+void imprimeSat(vector<satelite>& sat){
+     
+    cout << "SATELITES: " << endl;
+    cout << "Num,PosVetor,MemTotal, MemRest" << endl;
+    int n = sat.size();
+    for(int i=0;i<n;i++){
+        cout << sat[i].ns << "," << i << "," << sat[i].memTotal << "," << sat[i].memRestante << endl;
+    }    
+    cout << endl;
+}
+
+void imprimeShard(vector<shard>& shard){
+     
+    int n = shard.size();   
+    cout << "SHARDS: " << endl;
+    cout << "PosVetor,ShardH,ShardV,Ganho,CustoH,CustoV,Lida,LidaPor" << endl;
+    
+    for(int i=0;i<n;i++){
+        cout << i << "," << shard[i].posH << "," << shard[i].posV << "," << shard[i].rShard;
+        cout << "," << shard[i].cH << "," << shard[i].cV << "," << shard[i].lida << "," << shard[i].lidaPor << endl;
+    }
+    cout << endl;
+}/* impressões para teste */
+
+
+
 
 int main(int argc, char* argv[]){
-    int i, n, totalReward, toBeCollected, previousToBeCollected;
+    int i, n, totalReward, toBeCollected, previousToBeCollected, loop;
     vector<shard> shard;
     vector<satelite> sat;
     int changed = TRUE;
@@ -159,46 +187,26 @@ int main(int argc, char* argv[]){
     sort(sat.begin(),sat.end(),aZSat);
     sort(shard.begin(), shard.end(), compShard);
 
-    //impressões para teste
-    cout << "SATELITES: " << endl;
-    cout << "Num,PosVetor,Memoria Total" << endl;
-    n = sat.size();
-    for(i=0;i<n;i++){
-        cout << sat[i].ns << "," << i << "," << sat[i].memRestante << endl;
-    }    
-    cout << endl;
+    // TESTE
+    cout << "Leitura:" << endl;
+    imprimeSat(sat);
+    imprimeShard(shard);
+    cout << "toBeColl:," << toBeCollected << endl;
     
-    n = shard.size();   
-    cout << "SHARDS: " << endl;
-    cout << "PosVetor,ShardH,ShardV,Ganho,CustoH,CustoV,LidaPor" << endl;
-    
-    for(i=0;i<n;i++){
-        cout << i << "," << shard[i].posH << "," << shard[i].posV << "," << shard[i].rShard;
-        cout << "," << shard[i].cH << "," << shard[i].cV << "," << shard[i].lidaPor << endl;
-    }
-    cout << endl;
-    /* impressões para teste */
-    
+    loop = 0;
+        
     while(changed && toBeCollected && toBeCollected < previousToBeCollected) {
           changed = FALSE;
           previousToBeCollected = toBeCollected;
           
           toBeCollected = build(shard, sat, toBeCollected);
           
-          n = shard.size();   
-          cout << "SHARDS: " << endl;
-          cout << "PosVetor,ShardH,ShardV,Ganho,CustoH,CustoV,LidaPor" << endl;
-    
-          for(i=0;i<n;i++){
-                           cout << i << "," << shard[i].posH << "," << shard[i].posV << "," << shard[i].rShard;
-                           cout << "," << shard[i].cH << "," << shard[i].cV << "," << shard[i].lidaPor << endl;
-          }
-          cout << endl;
-          
-          cout << "TOTALREWARD: " << totalReward << endl;
-          cout << "TOBECOLLECTED: " << toBeCollected << endl;
-          cout << "COLLECTED: " << totalReward - toBeCollected << endl;
-          
+          //TESTE
+          cout << "Ida n.: " << loop << endl;
+          imprimeSat(sat);
+          imprimeShard(shard);
+          cout << "toBeColl:," << toBeCollected << endl;
+                  
           // se tem coisa a coletar:          
           if(toBeCollected) {
                 // percorre os satélites na sequencia inversa da ordenação inicial (maior para menor)            
@@ -257,23 +265,15 @@ int main(int argc, char* argv[]){
                       }
                 }             
           
-          }   
+          }
+          //TESTE
+          cout << "Volta n.: " << loop << endl;
+          imprimeSat(sat);
+          imprimeShard(shard);
+          cout << "toBeColl:," << toBeCollected << endl; 
+          
+          loop++;  
     }                
-
-    cout << endl << "Shards" << endl;
-    cout << "ShardH,ShardV,Ganho,CustoH,CustoV,LidaPor" << endl;
-    for(int i = 0; i < shard.size(); i++){
-                 cout << shard[i].posH << "," << shard[i].posV << "," << shard[i].rShard;
-                 cout << "," << shard[i].cH << "," << shard[i].cV;
-                 cout << "," << sat[shard[i].lidaPor].ns << endl;
-    }
-    
-    cout << endl << "MemoriaRestante" << endl;        
-    cout << "Num,PosVetor,MemRestante" << endl;
-    for(int i=0;i<sat.size();i++){
-        cout << sat[i].ns << "," << i << "," << sat[i].memRestante << endl;
-    }
-    cout << endl << "Objetivo" << totalReward - toBeCollected << endl << endl;
                       
     return 0;
  
