@@ -143,7 +143,7 @@ int readIn(vector<shard>& obj, vector<satelite>& satH,  char* entrada){
         seq = atoi(tok.c_str());
         sh.cV = seq;
         sh.lida = false;
-        sh.lidaPor = 0;
+        sh.lidaPor = -1;
         obj.insert(obj.end(),sh);
     
     }
@@ -236,13 +236,13 @@ int main(int argc, char* argv[]){
     for(int i = 0; i < shard.size(); i++){
                  cout << shard[i].posH << "," << shard[i].posV << "," << shard[i].rShard;
                  cout << "," << shard[i].cH << "," << shard[i].cV;
-                 cout << "," << sat[shard[i].lidaPor].ns << endl;
+                 cout << "," << shard[i].lidaPor << endl;
     }
     
-    cout << endl << "MemoriaRestante" << endl;        
-    cout << "Num,PosVetor,MemRestante" << endl;
+    cout << endl << "Satelites" << endl;        
+    cout << "Num,PosVetor,MemTotal,MemRestante" << endl;
     for(int i=0;i<sat.size();i++){
-        cout << sat[i].ns << "," << i << "," << sat[i].memRestante << endl;
+        cout << sat[i].ns << "," << i << "," << sat[i].memTotal << "," << sat[i].memRestante << endl;
     }
     
     cout << endl << "Satelites" << sat.size() << endl << endl;
