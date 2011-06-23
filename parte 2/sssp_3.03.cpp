@@ -27,6 +27,7 @@ struct satelite{
     int ns;            //Numero do satelite
     int memTotal;      //Memoria total do satelite
     int memRestante;   //Memoria restante do satelite
+    int prioridade;
 };
 
 
@@ -34,10 +35,11 @@ struct satelite{
 void imprimeSat(vector<satelite>& sat){
      
     cout << "SATELITES: " << endl;
-    cout << "Num,PosVetor,MemTotal, MemRest" << endl;
+    cout << "Num,PosVetor,MemTotal, MemRest,Prioridade" << endl;
     int n = sat.size();
     for(int i=0;i<n;i++){
-        cout << sat[i].ns << "," << i << "," << sat[i].memTotal << "," << sat[i].memRestante << endl;
+        cout << sat[i].ns << "," << i << "," << sat[i].memTotal << "," 
+             << sat[i].memRestante << "," << sat[i].prioridade << endl;
     }    
     cout << endl;
 }
@@ -64,7 +66,7 @@ void imprimeShard(vector<shard>& shard){
 }/* impressões para teste */
 
 /* funções auxiliares de ordenação */
-bool aZSat(satelite sat1, satelite sat2){
+bool aZSat(satelite sat1, satelite sat2){    
     return sat1.memRestante < sat2.memRestante;
 }
 
@@ -72,15 +74,20 @@ bool compShard(shard shard1, shard shard2){
     return max((float)shard1.rShard/(float)shard1.cH, (float)shard1.rShard/(float)shard1.cV) 
            > max((float)shard2.rShard/(float)shard2.cH, (float)shard2.rShard/(float)shard2.cV);
 }
-
+bool compShard2(shard shard1, shard shard2){
+    return shard1.rShard > shard2.rShard;
+}
 /* A função abre o arquivo de entrada, lê os parâmetros necessários, montando vetores de estruturas de satelites e
    vetores de estruturas de shards 
    */
-int readIn(vector<shard>& obj, vector<satelite>& satH, map<int,satelite>& satMap, char* entrada){
+int readIn(vector<shard>& obj, vector<satelite>& satH, map<int,int>& satMap, char* entrada){
     ifstream arqin(entrada);
     int n, m, seq, totalReward = 0, Collected = 0;
     string tok, line;
     stringstream iss;
+    vector<satelite>::iterator it;
+    vector<int>temAlvo;
+    
 
     satelite sat;
     shard sh;
@@ -90,28 +97,36 @@ int readIn(vector<shard>& obj, vector<satelite>& satH, map<int,satelite>& satMap
     getline(arqin,line);
     iss.str(line);                           //atribui a ultima linha para um stringstream iss
    
+    temAlvo.resize((2*n)+1);                        //vetor que indicará se existe shard na trajetória do satélite
+    for(int i=0; i<2*n+1; i++) temAlvo[i]=0;
+    
+    
+    
+    
     for(int i=0;i<n;i++){                        //Monta o vetor de satelites a partir da linha lida
         getline(iss,tok,' ');
         getline(iss,tok,' ');
         sat.memTotal = atoi(tok.c_str());
         sat.memRestante = sat.memTotal;
         sat.ns = 1 + i;
+        sat.prioridade = 0;
         satH.insert(satH.end(),sat);
-        satMap.insert(pair<int,satelite>(sat.ns, sat));
+        satMap.insert(pair<int,int>(sat.ns, i));
 
     }
 
     iss.clear();                             //limpa o stringstream para colocar nele uma nova linha
     getline(arqin,line);
     iss.str(line);
-    for(int i=0;i<n;i++){
+    for(int i=0;i<n;i++){                    //leitura dos satélites
         getline(iss,tok,' ');
         getline(iss,tok,' ');
         sat.memTotal = atoi(tok.c_str());
         sat.memRestante = sat.memTotal;
         sat.ns = 1 + i + n;
+        sat.prioridade = 0;
         satH.insert(satH.end(),sat);
-
+        satMap.insert(pair<int,int>(sat.ns, i+n));
     }
 
     getline(arqin,tok);                      //linha que contêm o número de shards
@@ -123,13 +138,18 @@ int readIn(vector<shard>& obj, vector<satelite>& satH, map<int,satelite>& satMap
         getline(iss,tok,' ');
         seq = atoi(tok.c_str());
         sh.posH = seq;
+        
+        temAlvo[sh.posH] = 1;
+        
         getline(iss,tok,' ');
         seq = atoi(tok.c_str());
         sh.posV = seq + n;
+        
+        temAlvo[sh.posV] = 1;
+        
         getline(iss,tok,' ');
         seq = atoi(tok.c_str());
-        sh.rShard = seq;
-        totalReward += seq;
+        sh.rShard = seq;     
         getline(iss,tok,' ');
         seq = atoi(tok.c_str());
         sh.cH = seq;
@@ -138,8 +158,27 @@ int readIn(vector<shard>& obj, vector<satelite>& satH, map<int,satelite>& satMap
         sh.cV = seq;
         sh.lida = false;
         sh.lidaPor = -1;
-        obj.insert(obj.end(),sh);
-    
+        
+        
+        
+        if((satH[satMap.find(sh.posH)->second].memTotal > sh.cH) ||
+           (satH[satMap.find(sh.posV)->second].memTotal > sh.cV)    ) {
+              
+              satH[satMap.find(sh.posH)->second].prioridade++;    
+              satH[satMap.find(sh.posV)->second].prioridade++;                                      
+              obj.insert(obj.end(),sh);
+              totalReward += sh.rShard;
+        }
+        
+        
+
+      /*  for(it = satH.begin(); it < satH.end(); it++) {
+               cout << ">>>>>>>" << it->ns << "      " << temAlvo[it->ns] << endl;
+               //system("pause");
+            if(!temAlvo[it->ns]){
+                satH.erase(it);
+            }
+        }*/
     }
 
     return totalReward;
@@ -184,44 +223,6 @@ int build(vector<shard>& shard, vector<satelite>& sat, vector<int>& resp, int to
     
     return toCollect;
 }/* build */
-
-
-int build_shards(vector<shard>& obj, map<int,satelite>& satMap, int toCollect){
-    int memH, memV, compH, compV;
-    map<int,satelite>::iterator iH, iV;
-    
-    
-    cout << endl << "BUILD PELAS SHARDS" << endl << endl;
-    
-    for(int k = 0; k < obj.size();k++){
-        iH = satMap.find(obj[k].posH);
-        memH = iH->second.memRestante;
-        
-        iV = satMap.find(obj[k].posV);
-        memV = iV->second.memRestante;
-
-        compH = memH - obj[k].cH;
-        compV = memV - obj[k].cV;
-        
-        if(compH > 0 && compH > compV){
-            iH->second.memRestante -= obj[k].cH;
-            toCollect += obj[k].rShard;
-            obj[k].lida = true;
-            //obj[k].lidaPor = i;                     COMO FAZER COM A HASH???????????????????
-        }
-        else{
-            if(obj[k].cV <= sat[j].memRestante){
-                sat[j].memRestante -= obj[k].cV;
-                Objetivo += obj[k].rShard;
-                obj[k].lida = true;
-                obj[k].lidaPor = j;
-            }
-        }
-        */
-    }
-    //cout << endl << "Objetivo: " << Objetivo << endl << endl;
-
-}/* buildShards */
 
 
 void volta1(vector<shard>& shard, vector<satelite>& sat, vector<int>& resp, int * toBeCollected) {
@@ -273,21 +274,22 @@ int main(int argc, char* argv[]){
     vector<shard> shard;
     vector<satelite> sat;
     vector<int> resp;
-    map<int,satelite> satMap;
-    map<int,satelite>::iterator it;
+    map<int,int> satMap;
+    //map<int,int>::iterator it;
 
     //int changed = TRUE;
 
     totalReward = readIn(shard, sat, satMap, argv[1]);
     toBeCollected = totalReward;
-    
+
+  
     sort(sat.begin(),sat.end(),aZSat);
     sort(shard.begin(), shard.end(), compShard);
 
     // TESTE
     cout << "Leitura:" << endl;
-    //imprimeSat(sat);
-    //imprimeShard(shard);
+    imprimeSat(sat);
+    imprimeShard(shard);
     cout << "toBeColl:," << toBeCollected << endl;
     
     loop = 0;
@@ -301,8 +303,8 @@ int main(int argc, char* argv[]){
           
     //TESTE
     cout << "Ida n.: " << loop << endl;
-    //imprimeSat(sat);
-    //imprimeShard(shard);
+    imprimeSat(sat);
+    imprimeShard(shard);
     cout << "toBeColl:," << toBeCollected << endl;
         
     while(toBeCollected && toBeCollected < previousToBeCollected) {
@@ -317,24 +319,25 @@ int main(int argc, char* argv[]){
           
           //TESTE
           cout << "Volta n.: " << loop << endl;
-          //imprimeSat(sat);
-          //imprimeShard(shard);
+          imprimeSat(sat);
+          imprimeShard(shard);
           cout << "toBeColl:," << toBeCollected << endl;
           
           toBeCollected = build(shard, sat, resp, toBeCollected);
           
           previousToBeCollected = toBeCollected;
-          
+          loop++;
+                    
           //TESTE
           cout << "Ida n.: " << loop << endl;
-          //imprimeSat(sat);
-          //imprimeShard(shard);
+          imprimeSat(sat);
+          imprimeShard(shard);
           cout << "toBeColl:," << toBeCollected << endl;
           
-          loop++;  
+  
     }                
     
-    imprimeResp(resp, shard);                   
+    //imprimeResp(resp, shard);                   
     return 0;
  
 }

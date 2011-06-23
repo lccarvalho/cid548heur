@@ -184,8 +184,10 @@ int main(int argc, char* argv[]){
     vector<satelite> satH;
     vector<satelite> satV;
     vector<int> resp;
+    multimap<int,satelite> satMap;
+    multimap<int,satelite>::iterator it;
 
-    readIn(obj, satH, satV, argv[1]);
+    readIn(obj, satH, satV, satMap, argv[1]);
     
     sort(satH.begin(),satH.end(),compSat);
 
