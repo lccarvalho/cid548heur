@@ -56,10 +56,11 @@ void imprimeResp(vector<int>& resp, vector<shard>& shard, int nSat, int total, i
              arqout << shard[i].posH << " " << shard[i].posV;
              if(shard[i].lidaPorNs > nSat/2) arqout << " v" << endl;
              else arqout << " h" << endl;
-         }         
+         }
      }
-        
-}    
+     arqout.close();
+
+}
                  
 void imprimeShard(vector<shard>& shard, int totalShards){
     int n = shard.size();   
@@ -171,6 +172,7 @@ int readIn(vector<shard>& shards, vector<satelite>& satelites, map<int,int>& sat
         //}
         
     }
+    arqin.close();
 
     return totalReward;
 } /* readIn */
@@ -267,13 +269,13 @@ void volta1(vector<shard>& shard, vector<satelite>& satelites, vector<int>& resp
 }
 
 int main(int argc, char* argv[]){
-    int totalReward, toBeCollected, previousToBeCollected, loop = 0, rdShards = 0;
+    int totalReward, toBeCollected, previousToBeCollected, loop = 0, rdShards = 0, TIME;
     vector<shard> shard;
     vector<satelite> satelites;
     vector<int> resp;
     map<int,int> satMap;
 
-    totalReward = readIn(shard, satelites, satMap, argv[1]);
+    totalReward = readIn(shard, satelites, satMap, argv[5]);
     toBeCollected = totalReward;
  
     sort(satelites.begin(),satelites.end(),aZSat);
@@ -293,7 +295,7 @@ int main(int argc, char* argv[]){
           loop++;
   
     }                
-    imprimeResp(resp, shard, satelites.size(), totalReward - toBeCollected, rdShards, argv[2]);                  
+    imprimeResp(resp, shard, satelites.size(), totalReward - toBeCollected, rdShards, argv[4]);                  
     return 0;
  
 }
