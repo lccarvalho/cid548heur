@@ -10,7 +10,7 @@ param d{i in V}, integer := sum{u in V: (u,i) in E}1 + sum{u in V: (i,u) in E}1;
 
 /* atribui para o numero maximo de cores o grau maximo do grafo + 1. Obs.: Existe um resultado em coloração que  */
 /* garante que o índice cromático de um grafo qualquer é sempre menor ou igual ao  grau máximo deste somado de 1 */
-param p, integer := 1 + max{i in V}d[i];
+param p, integer := max{i in V}d[i];
 
 /* indica se a cor i foi usada ou nao */
 var cor{i in 1..p}, binary;
@@ -21,11 +21,9 @@ var x{i in V, j in 1..p}, binary;
 /* restringe o numero de cores de um vertice como sendo exatamente 1 */
 s.t. unicidade{i in V}: sum{c in 1..p}x[i,c] = 1;
 
-/* restringe dois vertices adjacentes a terem cores diferentes */
-s.t. adjacencia{(i,j) in E, c in 1..p}: x[i,c] + x[j,c] <= 1;
-
-/* quando uma cor for usada em algum vertice, ela deve ser marcada como usada */
-s.t. uso{i in V, c in 1..p}: x[i,c] <= cor[c];
+/* restringe dois vertices adjacentes a terem cores diferentes e quando uma cor é usada em um vértice, ela deve estar marcada */
+/* como usada */
+s.t. adjacencia{(i,j) in E, c in 1..p}: x[i,c] + x[j,c] <= cor[c];
 
 /* minimiza a soma de cores usadas */
 minimize objetivo: sum{c in 1..p}cor[c];
