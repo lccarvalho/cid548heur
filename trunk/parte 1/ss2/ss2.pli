@@ -21,7 +21,7 @@ var x{i in A}, binary;
 /* variavel que indica o inicio da tarefa i */
 var sigma{i in A}, integer, >=0;
 
-/* indica se a tarefa i precede a variavel j. Nao existe para elementos de S */
+/* indica se a tarefa i precede a tarefa j. Nao existe para elementos de S */
 var prec{(i,j) in A cross A: i != j and (i,j) not in S}, binary;
 
 /* representa um número muito grande. Seu valor é definido como soma dos deadlines. Tal valor foi */
@@ -42,7 +42,7 @@ s.t. precedencia3{i in A, j in A: (i,j) not in S and (j,i) not in S and i != j}:
 /* essa constraint garante a precedencia dos pares de tarefas que estão em S */
 s.t. serie{(i,j) in S}: sigma[i] + t[i] <= sigma[j];
 
-/* essa constraint que se uma tarefa i termina depois do deadline, então x[i] = 1 e, caso cvontrário, */
+/* essa constraint que se uma tarefa i termina depois do deadline, então x[i] = 1 e, caso contrário, */
 /* x[i] = 0 */
 s.t. termino1{i in A}: d[i] - sigma[i] - t[i] <= (1 - x[i])*M;
 s.t. termino2{i in A}: d[i] - sigma[i] - t[i] >= -x[i]*M;
