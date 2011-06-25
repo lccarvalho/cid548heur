@@ -28,6 +28,7 @@ s.t. caminho{u in V: u != s and u != t}: sum{i in V: (i,u) in A}x[i,u] = sum{j i
 
 /* garante que o caminho tenha no maximo um vertice de cada par de C */
 s.t. pares{(i,j) in C}: sum{u in V: (i,u) in A}x[i,u] + sum{u in V: (u,j) in A}x[u,j] <= 1;
+s.t. pares2{(i,j) in C}: sum{u in V: (u,i) in A}x[u,i] + sum{u in V: (j,u) in A}x[j,u] <= 1;
 
 /* garante que o vertice inicial eh o vertice fonte */
 s.t. source: sum{j in V: (s,j) in A}x[s,j] = 1;
