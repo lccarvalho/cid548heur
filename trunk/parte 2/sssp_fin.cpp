@@ -53,7 +53,7 @@ void imprimeResp(vector<int>& resp, vector<shard>& shard, int nSat, int total, i
      arqout << rdShards << endl;
      for (int i=0;i<n;i++) {
          if(resp[i] != -1){
-             arqout << shard[i].posH << " " << shard[i].posV;
+             arqout << shard[i].posH << " " << shard[i].posV-nSat/2;
              if(shard[i].lidaPorNs > nSat/2) arqout << " v" << endl;
              else arqout << " h" << endl;
          }
@@ -265,7 +265,7 @@ void volta1(vector<shard>& shard, vector<satelite>& satelites, vector<int>& resp
                             }
                     }
             }
-    }             
+    }
 }
 
 int main(int argc, char* argv[]){
