@@ -31,8 +31,23 @@ struct satelite{
     int cover;         //Marca o número de shards que o satélite cobre
 };
 
+/******************* Impressoes para teste - Planilhas *******************/
 
-/* impressões para teste */
+/* Satelites */
+void imprimeShard(vector<shard>& shard, int totalShards){
+    int n = shard.size();   
+
+    cout << "SHARDS: "<< totalShards << endl;
+    cout << "PosVetor,ShardH,ShardV,Ganho,CustoH,CustoV,Lida,LidaPor Posição,Lidapor Numero" << endl;    
+    for(int i=0;i<n;i++){
+        cout << i << "," << shard[i].posH << "," << shard[i].posV << "," << shard[i].rShard;
+        cout << "," << shard[i].cH << "," << shard[i].cV << "," << shard[i].lida << "," << shard[i].lidaPorPos
+        << "," << shard[i].lidaPorNs << endl;
+    }
+    cout << endl;
+}/* Satelites */
+
+/* Shards */
 void imprimeSat(vector<satelite>& sat){
     int n = sat.size();
    
@@ -43,8 +58,11 @@ void imprimeSat(vector<satelite>& sat){
              << sat[i].memRestante << "," << sat[i].cover << endl;
     }    
     cout << endl;
-}
+}/* Shards */
 
+/******************* Impressoes para teste - Planilhas *******************/
+
+/* Impressao da resposta */
 void imprimeResp(vector<int>& resp, vector<shard>& shard, int nSat, int total, int rdShards, char* saida) {
      ofstream arqout(saida);
      int n = resp.size();
@@ -60,22 +78,7 @@ void imprimeResp(vector<int>& resp, vector<shard>& shard, int nSat, int total, i
      }
      arqout.close();
 
-}
-                 
-void imprimeShard(vector<shard>& shard, int totalShards){
-    int n = shard.size();   
-    
-    cout << "SHARDS: "<< totalShards << endl;
-    cout << "PosVetor,ShardH,ShardV,Ganho,CustoH,CustoV,Lida,LidaPor Posição,Lidapor Numero" << endl;    
-    for(int i=0;i<n;i++){
-        cout << i << "," << shard[i].posH << "," << shard[i].posV << "," << shard[i].rShard;
-        cout << "," << shard[i].cH << "," << shard[i].cV << "," << shard[i].lida << "," << shard[i].lidaPorPos
-        << "," << shard[i].lidaPorNs << endl;
-    }
-    cout << endl;
-}/* impressões para teste */
-
-
+}/* Impressao da resposta */
 
 /* funções auxiliares de ordenação */
 bool aZSat(satelite sat1, satelite sat2){    
@@ -95,12 +98,12 @@ bool compShard2(shard shard1, shard shard2){
 /* A função abre o arquivo de entrada, lê os parâmetros necessários, montando vetores de estruturas de satelites e
    vetores de estruturas de shards 
 */
-int readIn(vector<shard>& shards, vector<satelite>& satelites, map<int,int>& satMap, char* entrada){
+int readIn(vector<shard>& shards, vector<satelite>& satelites, char* entrada){
     ifstream arqin(entrada);
     int n, m, seq, totalReward = 0;
     string tok, line;
     stringstream iss;
-    
+
     satelite sat;
     shard sh;
 
@@ -117,7 +120,6 @@ int readIn(vector<shard>& shards, vector<satelite>& satelites, map<int,int>& sat
         sat.ns = 1 + i;
         sat.cover = 0;
         satelites.insert(satelites.end(),sat);
-        satMap.insert(pair<int,int>(sat.ns, i));
 
     }
 
@@ -132,7 +134,6 @@ int readIn(vector<shard>& shards, vector<satelite>& satelites, map<int,int>& sat
         sat.ns = 1 + i + n;
         sat.cover = 0;
         satelites.insert(satelites.end(),sat);
-        satMap.insert(pair<int,int>(sat.ns, i+n));
     }
 
     getline(arqin,tok);                      //linha que contêm o número de shards
@@ -159,18 +160,12 @@ int readIn(vector<shard>& shards, vector<satelite>& satelites, map<int,int>& sat
         sh.lida = false;
         sh.lidaPorPos = -1;
         sh.lidaPorNs = -1;
-        
-        // Se a shard cabe em pelo menos um dos satélites que a cobre, soma às shards cobertas pelos satélites leitores,
-        // adiciona o custo da shard ao total e insere ela no vetor de shards 
-        /*if((satelites[satMap.find(sh.posH)->second].memTotal > sh.cH) ||
-           (satelites[satMap.find(sh.posV)->second].memTotal > sh.cV)    ) {*/
-              
-              satelites[satMap.find(sh.posH)->second].cover++;    
-              satelites[satMap.find(sh.posV)->second].cover++;                                      
-              shards.insert(shards.end(),sh);
-              totalReward += sh.rShard;
-        //}
-        
+
+        satelites[sh.posH-1].cover++;
+        satelites[sh.posV-1].cover++;
+        shards.insert(shards.end(),sh);
+        totalReward += sh.rShard;
+
     }
     arqin.close();
 
@@ -184,13 +179,16 @@ int readIn(vector<shard>& shards, vector<satelite>& satelites, map<int,int>& sat
    de memória disponivel
    TEM QUE LIMPAR OS couts DE TESTE
    */
-int build(vector<shard>& shard, vector<satelite>& sat, vector<int>& resp, int toCollect, int * rdShards){    
+int build(vector<shard>& shard, vector<satelite>& sat, vector<int>& resp, int toCollect, int * rdShards, int TIME, int timeInit){    
     int nSat = sat.size();
     int nSh = shard.size();    
     resp.resize(nSh,-1);
 
     for(int i = 0; i < nSat; i++){
         for(int j = 0; j < nSh; j++){
+            if(difftime(time(NULL),timeInit) > TIME-1){
+              return toCollect;
+            }
             if(shard[j].posH == sat[i].ns && shard[j].lida == false){
                 if(sat[i].memRestante >= shard[j].cH){   
                     shard[j].lida = true;
@@ -216,12 +214,13 @@ int build(vector<shard>& shard, vector<satelite>& sat, vector<int>& resp, int to
             }
         }  
     }
-    
     return toCollect;
 }/* build */
 
-
-void volta1(vector<shard>& shard, vector<satelite>& satelites, vector<int>& resp, int * toBeCollected, int * rdShards) {
+/* Heuristica usada para melhorar os resultados obtidos pela construçao inicial. */
+/* Percorre os satelite de tras para frente, do que tem mais memoria para o que tem menos */
+/* Puxando todas as shards que conseguir para esses satelite */
+void volta(vector<shard>& shard, vector<satelite>& satelites, vector<int>& resp, int * toBeCollected, int * rdShards, int TIME, int timeInit) {
      int nSat = satelites.size();
      int nSh = shard.size();
      
@@ -229,13 +228,14 @@ void volta1(vector<shard>& shard, vector<satelite>& satelites, vector<int>& resp
     for(int i=nSat-1 ;i>=0 ;i--){
         //percorre as shards
         for(int j=0; j<=nSh-1; j++){
-        
+            if(difftime(time(NULL),timeInit) > TIME-1){
+              return;
+            }
             //se for "lível" pelo satélite e tiver sido lida por um de menos memória
             if((shard[j].posH == satelites[i].ns || shard[j].posV == satelites[i].ns) && shard[j].lidaPorPos < i ){
-                                               
                 //satélite "vertical", tem espaço para a shard: faz a troca       
                 if(satelites[i].ns >  nSat/2 && shard[j].cV <= satelites[i].memRestante) {
-                
+
                     if(shard[j].lida == true) satelites[shard[j].lidaPorPos].memRestante += shard[j].cH;
                     else{ 
                         *toBeCollected -= shard[j].rShard;
@@ -247,7 +247,6 @@ void volta1(vector<shard>& shard, vector<satelite>& satelites, vector<int>& resp
                     resp[j] = satelites[i].ns;
                     satelites[i].memRestante -= shard[j].cV;
                 }
-                
                 //satélite "horizontal", idem acima
                 if (satelites[i].ns <= nSat/2 && shard[j].cH <= satelites[i].memRestante){
 
@@ -266,37 +265,48 @@ void volta1(vector<shard>& shard, vector<satelite>& satelites, vector<int>& resp
                     }
             }
     }
+    return;
 }
 
 int main(int argc, char* argv[]){
-    int totalReward, toBeCollected, previousToBeCollected, loop = 0, rdShards = 0, TIME;
+    int totalReward, toBeCollected, previousToBeCollected, loop = 0, rdShards = 0, TIME = atoi(argv[2]); ;
+    int timeInit = time(NULL);
     vector<shard> shard;
     vector<satelite> satelites;
     vector<int> resp;
-    map<int,int> satMap;
 
-    totalReward = readIn(shard, satelites, satMap, argv[5]);
+    totalReward = readIn(shard, satelites, argv[5]);
     toBeCollected = totalReward;
- 
+
     sort(satelites.begin(),satelites.end(),aZSat);
     sort(shard.begin(), shard.end(), compShard);
 
     previousToBeCollected = toBeCollected;
-    toBeCollected = build(shard, satelites, resp, toBeCollected, &rdShards);    
-        
+    toBeCollected = build(shard, satelites, resp, toBeCollected, &rdShards, TIME, timeInit);    
+
+    // ENquanto mudar a resposta e tiver coisa a coletar
     while(toBeCollected && toBeCollected < previousToBeCollected) {
-          
-          // se tem coisa a coletar:          
-          if(toBeCollected) {
-              volta1(shard, satelites, resp, &toBeCollected, &rdShards);
+          //Controle de tempo
+          if(difftime(time(NULL),timeInit) > TIME-1){
+              imprimeResp(resp, shard, satelites.size(), totalReward - toBeCollected, rdShards, argv[4]);
+              return 0;
           }
-          previousToBeCollected = toBeCollected;                              
-          toBeCollected = build(shard, satelites, resp, toBeCollected, &rdShards);          
+          // se tem coisa a coletar:
+          if(toBeCollected) {
+              volta(shard, satelites, resp, &toBeCollected, &rdShards, TIME, timeInit);
+          }
+          //Controle de tempo
+          if(difftime(time(NULL),timeInit) > TIME-1){
+              imprimeResp(resp, shard, satelites.size(), totalReward - toBeCollected, rdShards, argv[4]);
+              return 0;
+          }
+          previousToBeCollected = toBeCollected;
+          toBeCollected = build(shard, satelites, resp, toBeCollected, &rdShards, TIME, timeInit);
           loop++;
-  
-    }                
-    imprimeResp(resp, shard, satelites.size(), totalReward - toBeCollected, rdShards, argv[4]);                  
+
+    }
+    imprimeResp(resp, shard, satelites.size(), totalReward - toBeCollected, rdShards, argv[4]);
     return 0;
- 
+
 }
 
